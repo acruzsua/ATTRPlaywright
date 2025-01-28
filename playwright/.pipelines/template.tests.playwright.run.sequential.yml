@@ -1,0 +1,43 @@
+parameters:
+  - name: TestVariables
+    type: object
+    default: {}
+
+  
+  jobs:
+    - job: APITestSSequential
+      displayName: API Quality Gate
+      timeoutInMinutes: 30
+      pool:
+        vmimage: ubuntu-latest
+      steps:
+        - checkout: self
+        - template: ./template.tests.npm.install.yml
+          parameters:
+            TestVariables:
+              TestRootPath: ${{parameters.TestVariables.TestRootPath}}
+              
+        -task: Npm@1
+          displayName: "Run Tests"
+          inputs:
+            command: custom
+            workingDir: "${{parameters.TestVariables.TestRootPath}}"
+            verbose: false
+            customCommand: "run pw:run"
+
+        - task: PublishTestResults@2
+          displayName: Publish Test PublishTestResults
+          inputs:
+            testResultsFiles: "**/*"
+            searchFolder: "${{ parameters.TestVariables.TestRootPath}}/results"
+            mergeTestResults: true
+            failTaskOnFailedTests: true
+            testRunTitle: "Report title"
+          condition: succededOrFailed()
+
+        - task: PublishPipelineArtifact@1
+          displayName: "Publish artifacts"
+          inputs:
+            targetPath: "${{ parameters.TestVariables.TestRootPath}}/artifacts"
+            artifactName: "**/*"
+          condition: succededOrFailed()         

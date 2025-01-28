@@ -1,0 +1,19 @@
+trigger:
+  branches:
+    include:
+      - main
+
+resources:
+  repositories:
+    - repository: ATTRPlaywright
+      type: git
+      name: /Github/acruzsua/ATTRPlaywright
+      ref: ref/heads/main
+
+stages:
+  - stage: api_tests
+    displayName: "API Regression Tests"
+    jobs:
+      - template: ./template.tests.playwright.run.sequential.yml@ATTRPlaywright
+          TestVariables:
+            TestRootPath: $(Build.SourcesDirectory)/$(Build.Repository.Name)/playwright

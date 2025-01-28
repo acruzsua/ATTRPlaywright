@@ -1,0 +1,12 @@
+parameters:
+  - name: TestVariables
+    type: object
+    default: {}
+
+steps:
+  - task: Npm@1
+    displayName: "Restore packages"
+    inputs:
+      command: custom
+      workingDir: "${{parameters.TestVariables.TestRootPath}}"
+      customCommand: 'install --cache "$(Agent.WorkFolder)/npm-cache"' 
