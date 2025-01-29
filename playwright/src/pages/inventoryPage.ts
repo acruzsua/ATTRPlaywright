@@ -1,51 +1,47 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, Locator, type Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
+export class InventoryPage extends BasePage{
+    readonly productSortDropdown: Locator;
+    readonly shoppingCartIcon: Locator;
 
-export class InventoryPage {
-
-    readonly page: Page;
-    readonly addOnesie:string;
-    readonly addBike:string;
-    readonly addBoltTShirt:string;
-    readonly addRedTShirt:string;
-    readonly addBackpack:string;
-    readonly addFleeceJacket:string;
-    readonly removeOnesie:string;
-
+    readonly products: {
+        onesie: Locator;
+        bikeLight: Locator;
+        boltTShirt: Locator;
+        redTShirt: Locator;
+        backpack: Locator;
+        fleeceJacket: Locator;
+    };
     constructor(page: Page) {
-        this.page = page;
-        this.addOnesie = "add-to-cart-sauce-labs-onesie";
-        this.addBike = "add-to-cart-sauce-labs-bike-light";
-        this.addBoltTShirt  = "add-to-cart-sauce-labs-bolt-t-shirt";
-        this.addRedTShirt = "add-to-cart-test.allthethings()-t-shirt-(red)";
-        this.addBackpack = "add-to-cart-sauce-labs-backpack";
-        this.addFleeceJacket = "add-to-cart-sauce-labs-fleece-jacket";
-        this.removeOnesie = "remove-sauce-labs-onesie";  
+        super(page);
+        this.productSortDropdown = page.getByTestId('product-sort-container');
+        this.shoppingCartIcon = page.getByTestId('shopping-cart-link');
+    
+        this.products = {
+            onesie: page.getByTestId('add-to-cart-sauce-labs-onesie'),
+            bikeLight: page.getByTestId('add-to-cart-sauce-labs-bike-light'),
+            boltTShirt: page.getByTestId('add-to-cart-sauce-labs-bolt-t-shirt'),
+            redTShirt: page.getByTestId('add-to-cart-test.allthethings()-t-shirt-(red)'),
+            backpack: page.getByTestId('add-to-cart-sauce-labs-backpack'),
+            fleeceJacket: page.getByTestId('add-to-cart-sauce-labs-fleece-jacket'),
+        };
+    
     }
 
-    async filterBy(
-        option: number,
-        value: string
-    ) {
-        const select = this.page.getByTestId('product-sort-container');
-        await select.selectOption({ index: option });
-        const selectedValue = await select.inputValue();
-        expect(selectedValue).toBe(value); 
+    async filterBy(option: number, expectedValue: string) {
+        await this.productSortDropdown.selectOption({ index: option });
+        const selectedValue = await this.productSortDropdown.inputValue();
+        expect(selectedValue).toBe(expectedValue);
     }
 
-    async addToCart(
-        dataTestId: string
-    ) {
-        await this.page.getByTestId(dataTestId).click();
+    async addToCart(product: keyof typeof this.products) {
+        await this.products[product].click();
     }
-    async remove(
-        dataTestId: string
-    ) {
-        await this.page.getByTestId(dataTestId).click();
+
+    async goToShoppingCart() {
+        await this.shoppingCartIcon.waitFor({ state: 'visible' }); // Ensure it's visible
+        await this.shoppingCartIcon.waitFor({ state: 'attached' }); // Ensure it's in the DOM
+        await this.shoppingCartIcon.click();
     }
-    async shoppingCart() {
-        //await this.page.getByTestId("shopping-cart-link").click();
-        await this.page.locator('#shopping_cart_container').click();
-    }   
-        
 }

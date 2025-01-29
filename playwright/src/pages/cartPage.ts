@@ -1,18 +1,22 @@
-import { type Page } from '@playwright/test';
+import { expect, Locator, type Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
+export class CartPage extends BasePage{
+    readonly checkoutButton: Locator;
+    readonly cartTitle : Locator;
 
-export class CartPage  {
-    readonly page: Page;
     constructor(page: Page) {
-        this.page = page;
+        super(page);
+        this.checkoutButton = page.getByTestId('checkout');
+        this.cartTitle = page.getByTestId('title');
     }
 
-    async accessItem(item: number) {
-        await this.page.getByTestId(`item-${item}-title-link`).click();
+    async checkOut() {
+        await this.checkoutButton.click();
     }
 
-     async checkOut() {
-        await this.page.getByTestId('checkout').click();
+    async isCartPage() {
+        await expect(this.cartTitle).toHaveText('Your Cart');
     }
-    
+
 }

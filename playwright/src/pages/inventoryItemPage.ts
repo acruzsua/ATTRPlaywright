@@ -1,16 +1,17 @@
-import { type Page } from '@playwright/test';
-import { InventoryPage } from './inventoryPage';
+import { Locator, type Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
+export class InventoryItemPage extends BasePage {
+    readonly backToProductsButton: Locator;
 
-export class InventoryItemPage extends InventoryPage {
-
-     constructor(page: Page) {
+    constructor(page: Page) {
         super(page);
+        this.backToProductsButton = page.getByTestId('back-to-products');
 
     }
 
     async backToProducts() {
-        await this.page.getByTestId('back-to-products').click();
+        await this.backToProductsButton.click();
     }
 
 }

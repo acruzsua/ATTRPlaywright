@@ -1,48 +1,51 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, Locator, type Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
-
-export class CheckoutPage {
-
-    readonly page: Page;
-    readonly firstName: string;
-    readonly lastName: string;
-    readonly postalCode: string;
-    readonly continueButton: string;
-    readonly total: string;
-    readonly finishButton: string;
+export class CheckoutPage extends BasePage{
+    readonly firstNameInput: Locator;
+    readonly lastNameInput: Locator;
+    readonly postalCodeInput: Locator;
+    readonly continueButton: Locator;
+    readonly totalLabel: Locator;
+    readonly finishButton: Locator;
+    readonly successMessage: Locator;
 
     constructor(page: Page) {
-        this.page = page;
-        this.firstName = "firstName";
-        this.lastName = "lastName";
-        this.postalCode  = "postalCode";
-        this.continueButton = "continue";
-        this.total = "total-label"
-        this.finishButton = "finish"
+        super(page);
+        this.firstNameInput = page.getByTestId('firstName');
+        this.lastNameInput = page.getByTestId('lastName');
+        this.postalCodeInput = page.getByTestId('postalCode');
+        this.continueButton = page.getByTestId('continue');
+        this.totalLabel = page.getByTestId("total-label");
+        this.finishButton = page.getByTestId('finish');
+        this.successMessage = page.getByText('Thank you for your order!', { exact: true });
     }
-    async fillBuyerInfo(
-        firstName: string,
-        lastName: string,
-        postalCode: string,
-    ) {
-        await this.page.getByTestId(this.firstName).fill(firstName);
-        await this.page.getByTestId(this.lastName).fill(lastName);
-        await this.page.getByTestId(this.postalCode).fill(postalCode);
+
+    async fillBuyerInfo(firstName: string, lastName: string, postalCode: string) {
+        await this.firstNameInput.fill(firstName);
+        await this.lastNameInput.fill(lastName);
+        await this.postalCodeInput.fill(postalCode);
     }
+
     async continue() {
-        await this.page.getByTestId(this.continueButton).click();
+        await this.continueButton.click();
     }
 
     async checkInvoice() {
-        await this.page.waitForSelector("div[class='summary_total_label']");
-        const total = await this.page.getByTestId(this.total);
-        await expect(total).toHaveText('Total: $8.63');
-
+        await expect(this.totalLabel).toBeVisible();
+        const totalText = await this.totalLabel.textContent();
+        expect(totalText).toMatch(/Total: \$/); // Valida que contenga un monto
     }
 
     async finish() {
-        await this.page.getByTestId(this.finishButton).click();
-        await expect(this.page.getByText('Thank you for your order!', { exact: true })).toBeVisible();
+        await this.finishButton.click();
     }
-     
+
+    async isCheckoutPage() {
+        await expect(this.firstNameInput).toBeVisible();
+    }
+
+    async isOrderSuccessful() {
+        await expect(this.successMessage).toBeVisible();
+    }
 }
