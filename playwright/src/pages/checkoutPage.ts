@@ -34,7 +34,7 @@ export class CheckoutPage extends BasePage{
     async checkInvoice() {
         await expect(this.totalLabel).toBeVisible();
         const totalText = await this.totalLabel.textContent();
-        expect(totalText).toMatch(/Total: \$/); // Valida que contenga un monto
+        expect(totalText).toMatch(/Total: \$/);
     }
 
     async finish() {
