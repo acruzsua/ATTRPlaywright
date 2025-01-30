@@ -33,21 +33,18 @@ test('SauceDemo - e2e ', async ({ page }) => {
   const cartPage = new CartPage(page);
   const checkoutPage = new CheckoutPage(page);
 
-  inventoryPage.filterBy(2, "lohi");
-  await page.waitForLoadState('domcontentloaded'); // Ensures DOM is ready
-  await page.waitForLoadState('networkidle'); // Ensures all requests are finished
-  inventoryPage.addToCart('onesie');
-  inventoryPage.goToShoppingCart();
-  cartPage.waitForElement("checkout")
-  cartPage.isCartPage();
-  cartPage.checkOut();
+  await inventoryPage.filterBy(2, "lohi");
+  await inventoryPage.addToCart('onesie');
+  await inventoryPage.goToShoppingCart();
+  await cartPage.waitForElement("checkout")
+  await cartPage.isCartPage();
+  await cartPage.checkOut();
 
-  checkoutPage.waitForElement("firstName") // Test Failed: lack of components rendered on page
-  checkoutPage.fillBuyerInfo("Alan", "Pratt", "1234");
-  checkoutPage.continue();
-  checkoutPage.checkInvoice();
-  checkoutPage.finish();
-  checkoutPage.isOrderSuccessful();
+  await checkoutPage.waitForElement("firstName")
+  await checkoutPage.fillBuyerInfo("Alan", "Pratt", "1234");
+  await checkoutPage.continue();
+  await checkoutPage.checkInvoice();
+  await checkoutPage.finish();
+  await checkoutPage.isOrderSuccessful();
 
 });
-

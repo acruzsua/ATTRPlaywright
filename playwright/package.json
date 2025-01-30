@@ -12,8 +12,8 @@
   },
   "scripts": {
     "pw:open": "playwright test --ui",
-    "pw:run": "playwright test"
-
+    "pw:run": "playwright test",
+    "pw:debug": "playwright test --debug --project=firefox"
   },
   "keywords": [],
   "author": "",
